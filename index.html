@@ -28,7 +28,7 @@
     text-align: center;
     font-size: 22px;
     font-weight: 500;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
     letter-spacing: 2px;
     color: #fff;
   }
@@ -51,10 +51,10 @@
     display: block;
     width: 100%;
     border-radius: 12px;
-    cursor: none;
     background: #0d0d12;
     border: 1px solid #222;
     touch-action: none;
+    cursor: crosshair;
   }
   .game-btn {
     display: block;
@@ -88,6 +88,17 @@
     line-height: 1.6;
   }
   .instructions span { color: #aaa; }
+  .tip-box {
+    background: #15151a;
+    border: 1px solid #2a2a35;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-top: 10px;
+    font-size: 13px;
+    color: #777;
+    text-align: center;
+  }
+  .tip-box strong { color: #ccc; }
 </style>
 </head>
 <body>
@@ -105,6 +116,9 @@
     <div class="big" id="final">0</div>
     <div class="label">最終得分</div>
   </div>
+  <div class="tip-box" id="tip">
+    <strong>💡 操作提示：</strong>點擊「開始遊戲」後，移動滑鼠控制飛船左右閃躲
+  </div>
   <div class="instructions">
     <span>🖱️ 滑鼠移動</span> 控制飛船 &nbsp;|&nbsp; <span>📱 觸控滑動</span> 也可操作<br>
     ⭐ 收集星星 +10 分 &nbsp;|&nbsp; ☄️ 躲避隕石，難度會逐漸提升！
@@ -119,6 +133,7 @@ const livesEl = document.getElementById('lives');
 const btn = document.getElementById('btn');
 const over = document.getElementById('over');
 const finalEl = document.getElementById('final');
+const tip = document.getElementById('tip');
 
 let state = 'menu';
 let score = 0;
@@ -150,6 +165,7 @@ function reset() {
   livesEl.textContent = '❤❤❤';
   over.style.display = 'none';
   btn.textContent = '重新開始';
+  tip.innerHTML = '<strong>💡 遊戲進行中：</strong>移動滑鼠控制飛船，收集星星、躲避隕石！';
 }
 
 function startGame() {
@@ -165,6 +181,7 @@ function gameOver() {
   over.style.display = 'block';
   btn.style.display = 'block';
   btn.textContent = '再玩一次';
+  tip.innerHTML = '<strong>💡 遊戲結束：</strong>點擊「再玩一次」重新挑戰！';
 }
 
 let mx = 210;
