@@ -6,66 +6,73 @@
 <title>星際閃避 Star Dodge</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
+  html, body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang TC", "Microsoft JhengHei", sans-serif;
     background: #0a0a0f;
     color: #e8e8e8;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    overflow: hidden;
+    padding: 12px 16px 24px;
   }
   .game-wrap {
     width: 100%;
-    max-width: 440px;
-    padding: 16px;
+    max-width: 420px;
     user-select: none;
     -webkit-user-select: none;
   }
   .game-title {
     text-align: center;
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 500;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     letter-spacing: 2px;
     color: #fff;
   }
   .game-subtitle {
     text-align: center;
-    font-size: 12px;
-    color: #888;
-    margin-bottom: 12px;
+    font-size: 11px;
+    color: #777;
+    margin-bottom: 8px;
   }
   .game-hud {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 4px;
-    font-size: 14px;
+    padding: 4px 2px;
+    font-size: 13px;
     color: #999;
   }
   .game-hud b { color: #fff; font-weight: 500; }
+  .canvas-wrap {
+    position: relative;
+    width: 100%;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #222;
+    background: #0d0d12;
+  }
   canvas {
     display: block;
     width: 100%;
-    border-radius: 12px;
-    background: #0d0d12;
-    border: 1px solid #222;
-    touch-action: none;
+    height: auto;
     cursor: crosshair;
+    touch-action: none;
   }
   .game-btn {
     display: block;
     width: 100%;
-    padding: 12px 0;
-    margin-top: 12px;
+    padding: 10px 0;
+    margin-top: 10px;
     border: 1px solid #333;
-    border-radius: 10px;
+    border-radius: 8px;
     background: #1a1a22;
     color: #fff;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 500;
     cursor: pointer;
     transition: background 0.2s ease, border-color 0.2s ease;
@@ -74,31 +81,31 @@
   .game-btn:hover { background: #252530; border-color: #444; }
   .game-over {
     text-align: center;
-    padding: 16px 0;
+    padding: 10px 0 4px;
     color: #888;
-    font-size: 14px;
+    font-size: 13px;
   }
-  .game-over .big { font-size: 36px; font-weight: 500; color: #fff; margin-bottom: 4px; }
+  .game-over .big { font-size: 32px; font-weight: 500; color: #fff; margin-bottom: 2px; }
   .game-over .label { color: #666; }
-  .instructions {
-    text-align: center;
-    font-size: 12px;
-    color: #555;
-    margin-top: 8px;
-    line-height: 1.6;
-  }
-  .instructions span { color: #aaa; }
   .tip-box {
     background: #15151a;
     border: 1px solid #2a2a35;
-    border-radius: 8px;
-    padding: 10px 14px;
-    margin-top: 10px;
-    font-size: 13px;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-top: 8px;
+    font-size: 12px;
     color: #777;
     text-align: center;
   }
-  .tip-box strong { color: #ccc; }
+  .tip-box strong { color: #bbb; }
+  .instructions {
+    text-align: center;
+    font-size: 11px;
+    color: #444;
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+  .instructions span { color: #888; }
 </style>
 </head>
 <body>
@@ -110,7 +117,9 @@
     <span>分數: <b id="score">0</b></span>
     <span>生命: <b id="lives">❤❤❤</b></span>
   </div>
-  <canvas id="c" width="420" height="560"></canvas>
+  <div class="canvas-wrap">
+    <canvas id="c" width="420" height="480"></canvas>
+  </div>
   <button class="game-btn" id="btn" onclick="startGame()">開始遊戲</button>
   <div class="game-over" id="over" style="display:none">
     <div class="big" id="final">0</div>
@@ -135,11 +144,13 @@ const over = document.getElementById('over');
 const finalEl = document.getElementById('final');
 const tip = document.getElementById('tip');
 
+const W = 420, H = 480;
+
 let state = 'menu';
 let score = 0;
 let lives = 3;
 let frame = 0;
-let ship = { x: 210, y: 500, w: 28, h: 32 };
+let ship = { x: W/2, y: H - 60, w: 28, h: 32 };
 let meteors = [];
 let stars = [];
 let particles = [];
@@ -147,10 +158,10 @@ let bgStars = [];
 let spawnRate = 60;
 let speedMult = 1;
 
-for (let i = 0; i < 60; i++) {
+for (let i = 0; i < 50; i++) {
   bgStars.push({
-    x: Math.random() * 420,
-    y: Math.random() * 560,
+    x: Math.random() * W,
+    y: Math.random() * H,
     s: Math.random() * 1.5 + 0.5,
     a: Math.random() * 0.6 + 0.2
   });
@@ -158,7 +169,7 @@ for (let i = 0; i < 60; i++) {
 
 function reset() {
   score = 0; lives = 3; frame = 0;
-  ship.x = 210; ship.y = 500;
+  ship.x = W/2; ship.y = H - 60;
   meteors = []; stars = []; particles = [];
   spawnRate = 60; speedMult = 1;
   scoreEl.textContent = '0';
@@ -184,21 +195,21 @@ function gameOver() {
   tip.innerHTML = '<strong>💡 遊戲結束：</strong>點擊「再玩一次」重新挑戰！';
 }
 
-let mx = 210;
+let mx = W/2;
 canvas.addEventListener('mousemove', e => {
   const r = canvas.getBoundingClientRect();
-  mx = (e.clientX - r.left) * (420 / r.width);
+  mx = (e.clientX - r.left) * (W / r.width);
 });
 canvas.addEventListener('touchmove', e => {
   e.preventDefault();
   const r = canvas.getBoundingClientRect();
-  mx = (e.touches[0].clientX - r.left) * (420 / r.width);
+  mx = (e.touches[0].clientX - r.left) * (W / r.width);
 }, { passive: false });
 
 function spawnMeteor() {
   const r = 14 + Math.random() * 16;
   const m = {
-    x: Math.random() * (420 - r * 2) + r,
+    x: Math.random() * (W - r * 2) + r,
     y: -r, r: r,
     vx: (Math.random() - 0.5) * 1.5,
     vy: 2 + Math.random() * 2 + speedMult,
@@ -217,7 +228,7 @@ function spawnMeteor() {
 
 function spawnStar() {
   stars.push({
-    x: Math.random() * 380 + 20,
+    x: Math.random() * (W - 40) + 20,
     y: -20,
     vy: 1.5 + Math.random() * 1.5,
     rot: Math.random() * Math.PI * 2,
@@ -317,7 +328,7 @@ function drawStar(s) {
 }
 
 function drawBg() {
-  ctx.clearRect(0, 0, 420, 560);
+  ctx.clearRect(0, 0, W, H);
   ctx.fillStyle = 'rgba(255,255,255,0.15)';
   for (const s of bgStars) {
     ctx.globalAlpha = s.a;
@@ -326,7 +337,7 @@ function drawBg() {
     ctx.fill();
     if (state === 'play') {
       s.y += 0.3 * speedMult;
-      if (s.y > 560) { s.y = -2; s.x = Math.random() * 420; }
+      if (s.y > H) { s.y = -2; s.x = Math.random() * W; }
     }
   }
   ctx.globalAlpha = 1;
@@ -347,14 +358,14 @@ function loop() {
   if (frame % 140 === 0) spawnStar();
 
   ship.x += (mx - ship.x) * 0.12;
-  ship.x = Math.max(16, Math.min(404, ship.x));
+  ship.x = Math.max(16, Math.min(W - 16, ship.x));
 
   for (let i = meteors.length - 1; i >= 0; i--) {
     const m = meteors[i];
     m.x += m.vx;
     m.y += m.vy;
     m.rot += m.vr;
-    if (m.y > 600) { meteors.splice(i, 1); continue; }
+    if (m.y > H + 40) { meteors.splice(i, 1); continue; }
     if (dist(ship.x, ship.y, m.x, m.y) < m.r + 12) {
       meteors.splice(i, 1);
       lives--;
@@ -371,7 +382,7 @@ function loop() {
     const s = stars[i];
     s.y += s.vy;
     s.rot += s.vr;
-    if (s.y > 580) { stars.splice(i, 1); continue; }
+    if (s.y > H + 20) { stars.splice(i, 1); continue; }
     if (dist(ship.x, ship.y, s.x, s.y) < 22) {
       stars.splice(i, 1);
       score += 10;
