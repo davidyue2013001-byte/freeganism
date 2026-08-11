@@ -87,25 +87,53 @@
   }
   .game-over .big { font-size: 32px; font-weight: 500; color: #fff; margin-bottom: 2px; }
   .game-over .label { color: #666; }
-  .tip-box {
-    background: #15151a;
-    border: 1px solid #2a2a35;
-    border-radius: 6px;
-    padding: 8px 12px;
-    margin-top: 8px;
+
+  /* 廣告欄 */
+  .ad-banner {
+    width: 100%;
+    margin-top: 12px;
+    padding: 12px;
+    border: 1px dashed #333;
+    border-radius: 8px;
+    background: #111118;
+    text-align: center;
+    color: #555;
     font-size: 12px;
-    color: #777;
-    text-align: center;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-  .tip-box strong { color: #bbb; }
-  .instructions {
-    text-align: center;
+  .ad-banner .ad-label {
+    font-size: 10px;
+    color: #444;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* 版權聲明 */
+  .footer-legal {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid #1a1a22;
     font-size: 11px;
     color: #444;
-    margin-top: 6px;
-    line-height: 1.5;
+    line-height: 1.7;
+    text-align: center;
   }
-  .instructions span { color: #888; }
+  .footer-legal a {
+    color: #666;
+    text-decoration: none;
+  }
+  .footer-legal a:hover {
+    color: #888;
+    text-decoration: underline;
+  }
+  .footer-legal .sep {
+    color: #333;
+    margin: 0 6px;
+  }
 </style>
 </head>
 <body>
@@ -125,12 +153,26 @@
     <div class="big" id="final">0</div>
     <div class="label">最終得分</div>
   </div>
-  <div class="tip-box" id="tip">
-    <strong>💡 操作提示：</strong>點擊「開始遊戲」後，移動滑鼠控制飛船左右閃躲
+
+  <!-- 廣告欄 -->
+  <div class="ad-banner">
+    <div>
+      <div class="ad-label">Advertisement</div>
+      <div>廣告位招租 — 聯繫我們</div>
+    </div>
   </div>
-  <div class="instructions">
-    <span>🖱️ 滑鼠移動</span> 控制飛船 &nbsp;|&nbsp; <span>📱 觸控滑動</span> 也可操作<br>
-    ⭐ 收集星星 +10 分 &nbsp;|&nbsp; ☄️ 躲避隕石，難度會逐漸提升！
+
+  <!-- 版權聲明及法律責任 -->
+  <div class="footer-legal">
+    <div>© 2026 星際閃避 Star Dodge. 保留所有權利。</div>
+    <div>
+      <a href="#">版權聲明</a>
+      <span class="sep">|</span>
+      <a href="#">法律責任</a>
+      <span class="sep">|</span>
+      <a href="#">隱私政策</a>
+    </div>
+    <div style="margin-top:4px; color:#333;">本網站內容僅供娛樂用途，作者不承擔任何因使用本網站而產生的法律責任。</div>
   </div>
 </div>
 
@@ -142,7 +184,6 @@ const livesEl = document.getElementById('lives');
 const btn = document.getElementById('btn');
 const over = document.getElementById('over');
 const finalEl = document.getElementById('final');
-const tip = document.getElementById('tip');
 
 const W = 420, H = 480;
 
@@ -176,7 +217,6 @@ function reset() {
   livesEl.textContent = '❤❤❤';
   over.style.display = 'none';
   btn.textContent = '重新開始';
-  tip.innerHTML = '<strong>💡 遊戲進行中：</strong>移動滑鼠控制飛船，收集星星、躲避隕石！';
 }
 
 function startGame() {
@@ -192,7 +232,6 @@ function gameOver() {
   over.style.display = 'block';
   btn.style.display = 'block';
   btn.textContent = '再玩一次';
-  tip.innerHTML = '<strong>💡 遊戲結束：</strong>點擊「再玩一次」重新挑戰！';
 }
 
 let mx = W/2;
