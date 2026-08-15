@@ -288,12 +288,9 @@
   <div class="game-title">🚀 星際閃避</div>
   <div class="game-subtitle">Star Dodge — 全方位閃躲，四面來襲！</div>
 
-  <div class="top-bar">
-    <div class="game-hud" style="padding:0;flex:1;">
-      <span>分數: <b id="score">0</b></span>
-      <span>生命: <b id="lives">❤❤❤</b></span>
-    </div>
-    <button class="user-btn" id="userBtn" onclick="openLogin()">👤 登入</button>
+  <div class="game-hud">
+    <span>分數: <b id="score">0</b></span>
+    <span>生命: <b id="lives">❤❤❤</b></span>
   </div>
 
   <div class="canvas-wrap">
@@ -310,7 +307,7 @@
     <button class="side-btn" onclick="openRewards()">🏆 獎勵</button>
   </div>
 
-  <div class="ad-banner">
+  <div class="ad-banner" onclick="showAdContact()" style="cursor:pointer;">
     <div>
       <div class="ad-label">Advertisement</div>
       <div>廣告位招租 — 聯繫我們</div>
@@ -318,15 +315,7 @@
   </div>
 
   <div class="footer-legal">
-    <div>© 2026 星際閃避 Star Dodge. 保留所有權利。</div>
-    <div>
-      <a href="#">版權聲明</a>
-      <span class="sep">|</span>
-      <a href="#">法律責任</a>
-      <span class="sep">|</span>
-      <a href="#">隱私政策</a>
-    </div>
-    <div style="margin-top:4px; color:#333;">本網站內容僅供娛樂用途，作者不承擔任何因使用本網站而產生的法律責任。</div>
+    <button class="side-btn" style="font-size:11px;padding:4px 10px;" onclick="openLegal()">📋 法律責任</button>
   </div>
 </div>
 
@@ -347,9 +336,37 @@
 <div class="modal-overlay" id="modal-settings">
   <div class="modal-box">
     <h3>⚙️ 設定</h3>
-    <p>音效、難度等設定功能即將推出，敬請期待！</p>
+    <div style="font-size:13px;color:#aaa;line-height:1.8;margin:12px 0;text-align:left;">
+      <p><strong style="color:#fff;">版本號：</strong>v1.0.0</p>
+      <p><strong style="color:#fff;">更新日期：</strong>2026年8月15日</p>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid #2a2a35;">
+        <p><strong style="color:#fff;">目前用戶：</strong><span id="settingsUser">未登入</span></p>
+        <div style="margin-top:8px;">
+          <button class="modal-btn" id="settingsUserBtn" onclick="settingsUserAction()">登入</button>
+        </div>
+      </div>
+      <p style="margin-top:12px;color:#555;font-size:12px;">音效、難度等更多設定功能即將推出，敬請期待！</p>
+    </div>
     <div class="modal-actions">
       <button class="modal-btn primary" onclick="closeModal('modal-settings')">關閉</button>
+    </div>
+  </div>
+</div>
+
+<!-- 法律責任彈窗 -->
+<div class="modal-overlay" id="modal-legal">
+  <div class="modal-box" style="text-align:left;">
+    <h3 style="text-align:center;">📋 法律責任</h3>
+    <div style="font-size:13px;color:#aaa;line-height:1.7;margin:12px 0;">
+      <p style="margin-bottom:10px;"><strong style="color:#fff;">版權聲明</strong><br>
+      © 2026 星際閃避 Star Dodge. 保留所有權利。本網站所有內容（包括但不限於遊戲、圖像、文字）均受版權法保護，未經授權不得複製、散佈或用於商業用途。</p>
+      <p style="margin-bottom:10px;"><strong style="color:#fff;">隱私政策</strong><br>
+      本網站使用瀏覽器本地儲存（localStorage）記錄用戶名稱及遊戲分數，所有資料僅儲存在您的裝置上，不會上傳至任何伺服器。我們不收集任何個人識別資訊。</p>
+      <p><strong style="color:#fff;">免責聲明</strong><br>
+      本網站內容僅供娛樂用途，作者不承擔任何因使用本網站而產生的法律責任。</p>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn primary" onclick="closeModal('modal-legal')">關閉</button>
     </div>
   </div>
 </div>
@@ -409,27 +426,34 @@ for (let i = 0; i < 50; i++) {
 }
 
 function updateUserBtn() {
+  const settingsUser = document.getElementById('settingsUser');
+  const settingsUserBtn = document.getElementById('settingsUserBtn');
   if (username) {
-    userBtn.textContent = '👤 ' + username;
-    userBtn.classList.add('logged');
+    if (settingsUser) settingsUser.textContent = username;
+    if (settingsUserBtn) settingsUserBtn.textContent = '登出 / 更換用戶';
   } else {
-    userBtn.textContent = '👤 登入';
-    userBtn.classList.remove('logged');
+    if (settingsUser) settingsUser.textContent = '未登入';
+    if (settingsUserBtn) settingsUserBtn.textContent = '登入';
   }
 }
 
 function openLogin() {
+  loginInput.value = '';
+  document.getElementById('modal-login').classList.add('active');
+  setTimeout(() => loginInput.focus(), 100);
+}
+
+function settingsUserAction() {
   if (username) {
     if (confirm('目前登入為「' + username + '」，要登出或更換用戶嗎？')) {
       username = '';
       localStorage.removeItem('starDodgeUser');
       updateUserBtn();
     }
-    return;
+  } else {
+    closeModal('modal-settings');
+    setTimeout(() => openLogin(), 200);
   }
-  loginInput.value = '';
-  document.getElementById('modal-login').classList.add('active');
-  setTimeout(() => loginInput.focus(), 100);
 }
 
 function doLogin() {
@@ -453,6 +477,14 @@ function openSettings() {
 function openRewards() {
   renderLeaderboard();
   document.getElementById('modal-rewards').classList.add('active');
+}
+
+function openLegal() {
+  document.getElementById('modal-legal').classList.add('active');
+}
+
+function showAdContact() {
+  alert('請電郵至 freeganism.world@gmail.com 洽談');
 }
 
 function closeModal(id) {
